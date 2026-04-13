@@ -1,0 +1,43 @@
+# Compiled files
+**/target/
+**/out/
+**/build/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+.mvn/
+
+#Logs
+**/logs/
+*.log
+*.log.gz
+
+# OF files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Docker
+*.jar.original
+docker-compose.override.yml
+
+# Application specific
+application-local.yml
+application-*.yml
+*.pid
+*.pid.lock
+
+# Temp files
+*.tmp
+*.temp
+*.cache
+
+# Secrets
+*.p12
+*.jks
+.secrets/
