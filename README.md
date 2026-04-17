@@ -1,6 +1,6 @@
 # 🏦 Banking Microservices
 
-Sistema bancario distribuido basado en microservicios, construido con **Spring Boot**, **Spring Cloud Gateway**, **Kafka**, **JWT** y **Docker**.
+Sistema bancario distribuido basado en microservicios, construido con **Spring Boot**, **Spring Cloud Gateway**, **Go**, **Kafka**, **JWT** y **Docker**.
 
 ---
 
@@ -11,6 +11,7 @@ Asegúrate de tener instalado:
 - Docker Desktop
 - Git
 - (Opcional) Java 21 y Maven para desarrollo local
+- Go
 
 ---
 
@@ -21,6 +22,7 @@ Asegúrate de tener instalado:
 | Java | 21 | Backend |
 | Spring Boot | 4.0.3 | Framework principal |
 | Spring Cloud Gateway | 4.0.3 | API Gateway + Seguridad |
+| GO | 1.25.0 | Backend |
 | PostgreSQL | 15 | Base de datos |
 | Apache Kafka | 7.5.0 | Mensajería asíncrona |
 | Redis | 7 | Caché |
@@ -36,6 +38,7 @@ Asegúrate de tener instalado:
 | Account Service | 8081 | Gestión de clientes y cuentas |
 | Transaction Service | 8082 | Transferencias, idempotencia y reversos |
 | Notification Service | 8084 | Notificaciones vía Kafka |
+| Analytics Service | 8085 | Métricas en tiempo real + WebSocket |
 
 ---
 
@@ -60,7 +63,14 @@ Asegúrate de tener instalado:
                 ┌───────────────┐     ┌───────────────┐
                 │ PostgreSQL    │     │ Kafka         │
                 │ (Datos)       │     │ (Eventos)     │
-                └───────────────┘     └───────────────┘
+                └───────────────┘     └───────┬───────┘
+                                               │
+                                               ▼
+                                    ┌───────────────┐
+                                    │   Analytics   │
+                                    │   Service     │
+                                    │   (Go/8085)   │
+                                    └───────────────┘
 ```
 
 ## 🐳 Ejecución con Docker
@@ -148,6 +158,23 @@ POST  /api/transacciones/transferencias - Realizar transferencia
 GET   /api/transacciones/{id}           - Consultar estado
 POST  /api/transacciones/{id}/reversar  - Reversar transferencia
 ```
+### Analytics
+```
+GET	 /api/analytics/metrics   -	Obtener métricas en tiempo real
+WS	 /ws                      -	WebSocket para alertas en vivo
+```
+**Respuesta exitosa**
+
+```json
+{
+ "totalTransferido": 1500,
+  "cantidadTransacciones": 5,
+  "promedioMonto": 300,
+  "maxTransferencia": 500,
+  "minTransferencia": 100,
+  "horaActualizacion": "2026-04-15T10:55:58-06:00"
+}
+```
 
 ### 🛠️ Desarrollo local (sin Docker)
 ```
@@ -166,6 +193,13 @@ cd services/notification-service
 # En otra terminal
 cd services/api-gateway
 ./mvnw spring-boot:run
+
+# En otra terminal
+cd service/go-analytics-service
+# Descarga de dependencias
+> go mod tidy
+# Ejecuta proyecto
+> go run cmd/api/main.go
 ```
 ### 📁 Estructura del proyecto
 ```
@@ -173,6 +207,7 @@ banking-microservices/
 ├── services/
 │   ├── account-service/
 │   ├── transaction-service/
+│   ├── go-analytics-service/
 │   ├── notification-service/
 │   └── api-gateway/
 ├── docker-compose.yml
@@ -188,6 +223,7 @@ banking-microservices/
 - Eventos asíncronos con Kafka
 - Notificaciones por email/SMS
 - Circuit Breaker (Resilience4j)
+- WebSocket con Golang
 - Documentación Swagger/OpenAPI
 - Docker y Docker Compose
 
