@@ -138,6 +138,24 @@ services:
     networks:
       - banking-network
 
+  go-analytics-service:
+    build: ./services/go-analytics-service
+    container_name: go-analytics-service
+    depends_on:
+      - postgres-bank
+      - kafka
+    environment:
+      DB_HOST: postgres-bank
+      DB_PORT: 5432
+      DB_USER: admin
+      DB_PASSWORD: secret123
+      DB_NAME: analyticsdb
+      KAFKA_BROKERS: kafka:29092
+    ports:
+      - "8085:8085"
+    networks:
+      - banking-network
+
 networks:
   banking-network:
     driver: bridge
